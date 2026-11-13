@@ -1,0 +1,57 @@
+using System;
+
+namespace Calculator
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            while (true)
+            {
+                Console.Write("Введіть перше число: ");
+                if (!double.TryParse(Console.ReadLine(), out double a))
+                {
+                    Console.WriteLine("Помилка: це не число.\n");
+                    continue;
+                }
+
+                Console.Write("Введіть операцію (+, -, *, /): ");
+                string op = Console.ReadLine();
+
+                Console.Write("Введіть друге число: ");
+                if (!double.TryParse(Console.ReadLine(), out double b))
+                {
+                    Console.WriteLine("Помилка: це не число.\n");
+                    continue;
+                }
+
+                switch (op)
+                {
+                    case "+":
+                        Console.WriteLine("Результат: " + (a + b));
+                        break;
+                    case "-":
+                        Console.WriteLine("Результат: " + (a - b));
+                        break;
+                    case "*":
+                        Console.WriteLine("Результат: " + (a * b));
+                        break;
+                    case "/":
+                        if (b == 0)
+                            Console.WriteLine("Помилка: на нуль ділити не можна.");
+                        else
+                            Console.WriteLine("Результат: " + (a / b));
+                        break;
+                    default:
+                        Console.WriteLine("Помилка: невідома операція.");
+                        break;
+                }
+
+                Console.Write("\nПродовжити? (y/n): ");
+                if (Console.ReadLine().ToLower() != "y")
+                    break;
+                Console.WriteLine();
+            }
+        }
+    }
+}

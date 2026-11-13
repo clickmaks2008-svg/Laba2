@@ -1,57 +1,90 @@
 using System;
+using System.Collections.Generic;
 
-namespace Calculator
+namespace Task4
 {
     class Program
     {
         static void Main(string[] args)
         {
-            while (true)
+            Console.WriteLine("Введіть вираз (наприклад: 5 + 5 * 10 + 4 / 2 - 3):");
+            string input = Console.ReadLine();
+
+            try
             {
-                Console.Write("Введіть перше число: ");
-                if (!double.TryParse(Console.ReadLine(), out double a))
-                {
-                    Console.WriteLine("Помилка: це не число.\n");
-                    continue;
-                }
-
-                Console.Write("Введіть операцію (+, -, *, /): ");
-                string op = Console.ReadLine();
-
-                Console.Write("Введіть друге число: ");
-                if (!double.TryParse(Console.ReadLine(), out double b))
-                {
-                    Console.WriteLine("Помилка: це не число.\n");
-                    continue;
-                }
-
-                switch (op)
-                {
-                    case "+":
-                        Console.WriteLine("Результат: " + (a + b));
-                        break;
-                    case "-":
-                        Console.WriteLine("Результат: " + (a - b));
-                        break;
-                    case "*":
-                        Console.WriteLine("Результат: " + (a * b));
-                        break;
-                    case "/":
-                        if (b == 0)
-                            Console.WriteLine("Помилка: на нуль ділити не можна.");
-                        else
-                            Console.WriteLine("Результат: " + (a / b));
-                        break;
-                    default:
-                        Console.WriteLine("Помилка: невідома операція.");
-                        break;
-                }
-
-                Console.Write("\nПродовжити? (y/n): ");
-                if (Console.ReadLine().ToLower() != "y")
-                    break;
-                Console.WriteLine();
+                double result = Calculate(input);
+                Console.WriteLine("Відповідь: " + result);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Помилка: " + ex.Message);
+            }
+
+            Console.ReadLine();
+        }
+
+        static double Calculate(string input)
+        {
+            // Розбиваємо рядок на частини по пробілах
+            string[] parts = input.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length % 2 == 0)
+                throw new Exception("неправильний вираз.");
+
+            List<double> numbers = new List<double>();
+            List<string> ops = new List<string>();
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    double n;
+                    if (!double.TryParse(parts[i], out n))
+                        throw new Exception("'" + parts[i] + "' - це не число.");
+                    numbers.Add(n);
+                }
+                else
+                {
+                    if (parts[i] != "+" && parts[i] != "-" && parts[i] != "*" && parts[i] != "/")
+                        throw new Exception("невідома операція '" + parts[i] + "'.");
+                    ops.Add(parts[i]);
+                }
+            }
+
+            // Перший прохід: множення і ділення
+            int k = 0;
+            while (k < ops.Count)
+            {
+                if (ops[k] == "*" || ops[k] == "/")
+                {
+                    if (ops[k] == "/" && numbers[k + 1] == 0)
+                        throw new Exception("на нуль ділити не можна.");
+
+                    if (ops[k] == "*")
+                        numbers[k] = numbers[k] * numbers[k + 1];
+                    else
+                        numbers[k] = numbers[k] / numbers[k + 1];
+
+                    numbers.RemoveAt(k + 1);
+                    ops.RemoveAt(k);
+                }
+                else
+                {
+                    k++;
+                }
+            }
+
+            // Другий прохід: додавання і віднімання
+            double result = numbers[0];
+            for (int i = 0; i < ops.Count; i++)
+            {
+                if (ops[i] == "+")
+                    result += numbers[i + 1];
+                else
+                    result -= numbers[i + 1];
+            }
+
+            return result;
         }
     }
 }
